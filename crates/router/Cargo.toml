@@ -1,0 +1,48 @@
+[package]
+name = "router"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = ["kv_store", "olap"]
+olap = [ "storage_impl/olap", "scheduler/olap"] #"data_models/olap","api_models/olap", "dep:analytics"
+oltp = ["storage_impl/oltp"]
+kv_store = ["scheduler/kv_store"]
+
+[dependencies]
+# First Party dependencies
+api_models = { version = "0.1.0", path = "../api_models"}
+common_utils = { version = "0.1.0", path = "../common_utils" }
+data_models = { version = "0.1.0", path = "../data_models" }
+diesel_models = { version = "0.1.0", path = "../diesel_models" }
+hyperswitch_interfaces = { version = "0.1.0", path = "../hyperswitch_interfaces" }
+masking = { version = "0.1.0", path = "../masking" }
+redis_interface = { version = "0.1.0", path = "../redis_interface" }
+router_env = { version = "0.1.0", path = "../router_env" }
+router_derive = { version = "0.1.0", path = "../router_derive" }
+storage_impl = { version = "0.1.0", path = "../storage_impl" }
+scheduler = { version = "0.1.0", path = "../scheduler" }
+
+actix-web = "4.3.1"
+async-bb8-diesel = { git = "https://github.com/jarnura/async-bb8-diesel", rev = "53b4ab901aab7635c8215fd1c2d542c8db443094" }
+bb8 = "0.8.3"
+config = { version = "0.14.0", features = ["toml"] }
+diesel = { version = "2.1.0", features = ["postgres"] }
+error-stack = "0.4.1"
+num_cpus = "1.16.0"
+async-trait = "0.1.79"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+serde_with = "3.4.0"
+serde_path_to_error = "0.1.14"
+clap = "4.5.4"
+rust_decimal = { version = "1.35.0", features = ["serde-with-float", "serde-with-str"] }
+tokio = "1.37.0"
+mime = "0.3.17"
+futures = "0.3.30"
+dyn-clone = "1.0.17"
+base64 = "0.22.0"
+thiserror = "1.0.40"

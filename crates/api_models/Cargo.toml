@@ -1,0 +1,21 @@
+[package]
+name = "api_models"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# First party crates
+common_enums = { version = "0.1.0", path = "../common_enums" }
+router_derive = { version = "0.1.0", path = "../router_derive" }
+
+actix-web = { version = "4.3.1", optional = true }
+error-stack = "0.4.1"
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+strum = { version = "0.26.2", features = ["derive"] }
+time = { version = "0.3.21", features = ["serde", "serde-well-known", "std"] }
+utoipa = { version = "4.2.0", features = ["preserve_order", "preserve_path_order"] }
