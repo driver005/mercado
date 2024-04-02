@@ -148,7 +148,7 @@ pub(crate) async fn fetch_raw_secrets(
         log: conf.log,
         #[cfg(feature = "kv_store")]
         drainer: conf.drainer,
-        // encryption_management: conf.encryption_management,
+        encryption_management: conf.encryption_management,
         secrets_management: conf.secrets_management,
         proxy: conf.proxy,
         env: conf.env,

@@ -10,6 +10,9 @@ use config::{Environment, File};
 #[cfg(feature = "email")]
 use external_services::email::EmailSettings;
 
+use external_services::managers::{
+    encryption_management::EncryptionManagementConfig, secrets_management::SecretsManagementConfig,
+};
 use hyperswitch_interfaces::secrets_interface::secret_state::{
     SecretState, SecretStateContainer, SecuredSecret,
 };
@@ -27,7 +30,6 @@ use crate::{
     // core::errors::{ApplicationError, ApplicationResult},
     env::{self, logger, Env},
     events::EventsConfig,
-    external_move::SecretsManagementConfig,
 };
 
 #[derive(Debug, Eq, PartialEq)]
@@ -82,7 +84,7 @@ pub struct Settings<S: SecretState> {
     pub webhooks: WebhooksSettings,
     pub api_keys: SecretStateContainer<ApiKeys, S>,
     // pub file_storage: FileStorageConfig,
-    // pub encryption_management: EncryptionManagementConfig,
+    pub encryption_management: EncryptionManagementConfig,
     pub secrets_management: SecretsManagementConfig,
 
     #[cfg(feature = "dummy_connector")]

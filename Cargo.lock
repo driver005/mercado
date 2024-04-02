@@ -3966,6 +3966,7 @@ dependencies = [
  "diesel_models",
  "dyn-clone",
  "error-stack",
+ "external_services",
  "futures",
  "hyperswitch_interfaces",
  "masking",
