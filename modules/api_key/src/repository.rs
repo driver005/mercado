@@ -1,9 +1,14 @@
-use diesel::dsl::Asc;
-use diesel::pg::Pg;
-use diesel::query_dsl::methods::{FilterDsl, OrderDsl};
-use diesel::{BoxableExpression, QueryDsl};
+use diesel::{
+    associations::HasTable,
+    dsl::IntoBoxed,
+    pg::Pg,
+    prelude::*,
+    query_builder::QueryFragment,
+    query_dsl::methods::{BoxedDsl, FilterDsl, LimitDsl, LoadQuery, OffsetDsl, OrderDsl},
+    ExpressionMethods,
+};
 
-use diesel::{associations::HasTable, ExpressionMethods};
+use diesel_models::schema::api_key as model;
 use diesel_models::{errors, generics, schema::api_key::dsl, PgPooledConn, StorageResult};
 
 use crate::models::{ApiKey, ApiKeyNew, ApiKeyUpdateInternal, HashedApiKey};
@@ -29,21 +34,24 @@ impl ApiKey {
 
     pub async fn filter<P, O>(
         conn: &PgPooledConn,
-        filters: P,
+        predicate: P,
         limit: Option<i64>,
         offset: Option<i64>,
         order: Option<O>,
     ) -> StorageResult<Vec<ApiKey>>
     where
-        P: BoxableExpression<ApiKey, Pg> + FilterDsl<P> + Send + 'static,
-        O: BoxableExpression<ApiKey, Pg> + OrderDsl<O> + Send + 'static,
+        model::table: BoxedDsl<'static, Pg>,
+        IntoBoxed<'static, model::table, Pg>: FilterDsl<P, Output = IntoBoxed<'static, model::table, Pg>>
+            + LimitDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OffsetDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OrderDsl<O, Output = IntoBoxed<'static, model::table, Pg>>
+            + LoadQuery<'static, PgConnection, ApiKey>
+            + QueryFragment<Pg>
+            + Send,
+        O: Expression,
     {
-        generics::generic_filter::<<Self as HasTable>::Table, P, _, ApiKey>(
-            conn,
-            filters,
-            limit,
-            offset,
-            Some(dsl::id.eq("test")),
+        generics::generic_filter::<model::table, P, O, ApiKey>(
+            conn, predicate, limit, offset, order,
         )
         .await
     }
@@ -82,13 +90,15 @@ impl ApiKey {
             .await
     }
 
+    // Custom functions
+
     pub async fn find_optional_by_hashed_api_key(
         conn: &PgPooledConn,
-        hashed_api_key: HashedApiKey,
+        hashed_model: HashedApiKey,
     ) -> StorageResult<Option<Self>> {
         generics::generic_find_one_optional::<<Self as HasTable>::Table, _, _>(
             conn,
-            dsl::token.eq(hashed_api_key),
+            dsl::token.eq(hashed_model),
         )
         .await
     }

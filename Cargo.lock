@@ -320,35 +320,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0952808a6c2afd1aa8947271f3a60f1a6763c7b912d210184c5149b5cf147247"
 
 [[package]]
-name = "api_key"
-version = "0.1.0"
-dependencies = [
- "api_models",
- "async-trait",
- "blake3",
- "common_enums",
- "common_utils",
- "data_models",
- "diesel",
- "diesel_models",
- "error-stack",
- "masking",
- "router",
- "router_derive",
- "router_env",
- "serde",
- "serde_json",
- "storage_impl",
- "time",
-]
-
-[[package]]
 name = "api_models"
 version = "0.1.0"
 dependencies = [
  "actix-web",
  "common_enums",
  "error-stack",
+ "masking",
+ "mime",
  "router_derive",
  "serde",
  "serde_json",
@@ -1636,11 +1615,34 @@ dependencies = [
 name = "data_models"
 version = "0.1.0"
 dependencies = [
+ "actix-web",
+ "api_models",
+ "async-trait",
+ "bb8",
+ "blake3",
+ "clap",
+ "common_utils",
+ "config",
+ "diesel",
  "diesel_models",
  "error-stack",
+ "external_services",
+ "hex",
+ "hyperswitch_interfaces",
+ "masking",
+ "mime",
+ "num_cpus",
+ "once_cell",
+ "redis_interface",
+ "ring",
+ "router_derive",
+ "router_env",
+ "rust_decimal",
  "serde",
  "serde_json",
+ "serde_path_to_error",
  "thiserror",
+ "tokio",
 ]
 
 [[package]]
@@ -2922,6 +2924,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "modules"
+version = "0.1.0"
+dependencies = [
+ "api_models",
+ "async-trait",
+ "common_utils",
+ "data_models",
+ "diesel",
+ "diesel_models",
+ "dyn-clone",
+ "error-stack",
+ "futures",
+ "hyperswitch_interfaces",
+ "masking",
+ "once_cell",
+ "redis_interface",
+ "router",
+ "router_env",
+ "scheduler",
+ "serde",
+ "serde_json",
+ "storage_impl",
+ "time",
+ "tokio",
+]
+
+[[package]]
 name = "moka"
 version = "0.12.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3968,10 +3997,12 @@ dependencies = [
  "error-stack",
  "external_services",
  "futures",
+ "hex",
  "hyperswitch_interfaces",
  "masking",
  "mime",
  "num_cpus",
+ "once_cell",
  "redis_interface",
  "router_derive",
  "router_env",
@@ -4223,6 +4254,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "common_utils",
+ "data_models",
  "diesel_models",
  "error-stack",
  "external_services",
@@ -5288,21 +5320,6 @@ name = "urlencoding"
 version = "2.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
-
-[[package]]
-name = "user"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "common_utils",
- "diesel",
- "diesel_models",
- "router_derive",
- "serde",
- "serde_json",
- "storage_impl",
- "time",
-]
 
 [[package]]
 name = "utf8parse"

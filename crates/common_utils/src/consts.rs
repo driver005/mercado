@@ -3,6 +3,9 @@
 /// Number of characters in a generated ID
 pub const ID_LENGTH: usize = 20;
 
+/// Number of characters in a generated API key
+pub const API_KEY_LENGTH: usize = 64;
+
 /// Characters to use for generating NanoID
 pub(crate) const ALPHABETS: [char; 62] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',

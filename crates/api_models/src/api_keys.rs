@@ -1,10 +1,26 @@
 use crate::enums::ApiKeyType;
+use masking::StrongSecret;
 use serde::{Deserialize, Serialize};
+use time::PrimitiveDateTime;
 use utoipa::ToSchema;
 
 #[derive(Debug, Deserialize, ToSchema, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct RetrieveApiKeyRequest;
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct RetrieveApiKeyResponse {
+    pub id: String,
+    pub salt: String,
+    pub redacted: StrongSecret<String>,
+    pub title: String,
+    pub type_: ApiKeyType,
+    pub last_used_at: Option<PrimitiveDateTime>,
+    pub created_by: String,
+    pub created_at: PrimitiveDateTime,
+    pub revoked_by: Option<String>,
+    pub revoked_at: Option<PrimitiveDateTime>,
+}
 
 #[derive(Debug, Deserialize, ToSchema, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -40,6 +56,21 @@ pub struct CreateApiKeyRequest {
 
     #[serde(rename = "type")]
     pub type_: ApiKeyType,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct CreateApiKeyResponse {
+    pub id: String,
+    pub token: StrongSecret<String>,
+    pub salt: String,
+    pub redacted: StrongSecret<String>,
+    pub title: String,
+    pub type_: ApiKeyType,
+    pub last_used_at: Option<PrimitiveDateTime>,
+    pub created_by: String,
+    pub created_at: PrimitiveDateTime,
+    pub revoked_by: Option<String>,
+    pub revoked_at: Option<PrimitiveDateTime>,
 }
 
 #[derive(Debug, Deserialize, ToSchema, Serialize)]

@@ -149,10 +149,7 @@ where
     let key = key.as_ref();
     let redis = &store
         .get_redis_conn()
-        .map_err(|er| {
-            let error = format!("{}", er);
-            er.change_context(StorageError::RedisError(error))
-        })
+        .map_err(StorageError::RedisError)
         .attach_printable("Failed to get redis connection")?;
     let redis_val = redis.get_and_deserialize_key::<T>(key, type_name).await;
     let get_data_set_redis = || async {
@@ -212,10 +209,7 @@ where
 
     let redis_conn = store
         .get_redis_conn()
-        .map_err(|er| {
-            let error = format!("{}", er);
-            er.change_context(StorageError::RedisError(error))
-        })
+        .map_err(StorageError::RedisError)
         .attach_printable("Failed to get redis connection")?;
 
     redis_conn
@@ -231,10 +225,7 @@ pub async fn publish_into_redact_channel<'a>(
 ) -> CustomResult<usize, StorageError> {
     let redis_conn = store
         .get_redis_conn()
-        .map_err(|er| {
-            let error = format!("{}", er);
-            er.change_context(StorageError::RedisError(error))
-        })
+        .map_err(StorageError::RedisError)
         .attach_printable("Failed to get redis connection")?;
 
     redis_conn

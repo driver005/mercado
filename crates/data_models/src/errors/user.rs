@@ -1,10 +1,9 @@
 use common_utils::errors::CustomResult;
 
-use crate::services::ApplicationResponse;
+use crate::configs::settings::ApplicationResponses;
 
 pub type UserResult<T> = CustomResult<T, UserErrors>;
-pub type UserResponse<T> = CustomResult<ApplicationResponse<T>, UserErrors>;
-pub mod sample_data;
+pub type UserResponse<T> = CustomResult<ApplicationResponses<T>, UserErrors>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum UserErrors {

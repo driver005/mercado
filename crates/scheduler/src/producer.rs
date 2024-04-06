@@ -12,8 +12,8 @@ use super::{
     metrics,
 };
 use crate::{
-    configs::settings::SchedulerSettings, errors, flow::SchedulerFlow,
-    scheduler::SchedulerInterface, utils::*, SchedulerAppState,
+    configs::SchedulerSettings, errors, flow::SchedulerFlow, scheduler::SchedulerInterface,
+    utils::*, SchedulerAppState,
 };
 
 #[instrument(skip_all)]

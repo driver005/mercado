@@ -6,7 +6,7 @@ use error_stack::ResultExt;
 use masking::StrongSecret;
 use redis::{kv_store::RedisConnInterface, RedisStore};
 // mod address;
-pub mod config;
+// pub mod config;
 pub mod connection;
 pub mod database;
 pub mod errors;

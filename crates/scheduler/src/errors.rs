@@ -60,24 +60,6 @@ pub enum ProcessTrackerError {
     TypeConversionError,
 }
 
-#[macro_export]
-macro_rules! error_to_process_tracker_error {
-    ($($path: ident)::+ < $st: ident >, $($path2:ident)::* ($($inner_path2:ident)::+ <$st2:ident>) ) => {
-        impl From<$($path)::+ <$st>> for ProcessTrackerError {
-            fn from(err: $($path)::+ <$st> ) -> Self {
-                $($path2)::*(err)
-            }
-        }
-    };
-
-    ($($path: ident)::+  <$($inner_path:ident)::+>, $($path2:ident)::* ($($inner_path2:ident)::+ <$st2:ident>) ) => {
-        impl<'a> From< $($path)::+ <$($inner_path)::+> > for ProcessTrackerError {
-            fn from(err: $($path)::+ <$($inner_path)::+> ) -> Self {
-                $($path2)::*(err)
-            }
-        }
-    };
-}
 pub trait PTError: Send + Sync + 'static {
     fn to_pt_error(&self) -> ProcessTrackerError;
 }
@@ -95,6 +77,31 @@ impl<T: PTError + std::fmt::Debug + std::fmt::Display> From<error_stack::Report<
         logger::error!(error=%error.current_context());
         error.current_context().to_pt_error()
     }
+}
+
+impl PTError for data_models::errors::ApiErrorResponse {
+    fn to_pt_error(&self) -> ProcessTrackerError {
+        ProcessTrackerError::EApiErrorResponse
+    }
+}
+
+#[macro_export]
+macro_rules! error_to_process_tracker_error {
+    ($($path: ident)::+ < $st: ident >, $($path2:ident)::* ($($inner_path2:ident)::+ <$st2:ident>) ) => {
+        impl From<$($path)::+ <$st>> for ProcessTrackerError {
+            fn from(err: $($path)::+ <$st> ) -> Self {
+                $($path2)::*(err)
+            }
+        }
+    };
+
+    ($($path: ident)::+  <$($inner_path:ident)::+>, $($path2:ident)::* ($($inner_path2:ident)::+ <$st2:ident>) ) => {
+        impl<'a> From< $($path)::+ <$($inner_path)::+> > for ProcessTrackerError {
+            fn from(err: $($path)::+ <$($inner_path)::+> ) -> Self {
+                $($path2)::*(err)
+            }
+        }
+    };
 }
 
 error_to_process_tracker_error!(

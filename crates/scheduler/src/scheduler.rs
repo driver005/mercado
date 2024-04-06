@@ -10,7 +10,7 @@ use tokio::sync::mpsc;
 
 use super::env::logger::error;
 pub use crate::{
-    configs::settings::SchedulerSettings,
+    configs::SchedulerSettings,
     consumer::{self, workflows},
     db::{process_tracker::ProcessTrackerInterface, queue::QueueInterface},
     errors,

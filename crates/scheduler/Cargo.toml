@@ -12,6 +12,7 @@ email = ["external_services/email"]
 [dependencies]
 # First party crates
 common_utils = { version = "0.1.0", path = "../common_utils", features = ["signals", "async_ext"] }
+data_models = { version = "0.1.0", path = "../data_models" }
 diesel_models = { version = "0.1.0", path = "../diesel_models", features = ["kv_store"] }
 external_services = { version = "0.1.0", path = "../external_services" }
 masking = { version = "0.1.0", path = "../masking" }

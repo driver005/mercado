@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
     "crates/*",
-    "modules/*",
 ]
 package.edition = "2021"
 package.rust-version = "1.77"

@@ -1,11 +1,12 @@
 use async_bb8_diesel::{AsyncConnection, ConnectionError};
 use bb8::CustomizeConnection;
-use data_models::errors::{StorageError, StorageResult};
+use data_models::{
+    configs::settings::Database,
+    errors::{StorageError, StorageResult},
+};
 use diesel::PgConnection;
 use error_stack::ResultExt;
 use masking::PeekInterface;
-
-use crate::config::Database;
 
 pub type PgPool = bb8::Pool<async_bb8_diesel::ConnectionManager<PgConnection>>;
 pub type PgPooledConn = async_bb8_diesel::Connection<PgConnection>;

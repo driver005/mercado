@@ -1,6 +1,14 @@
 #![allow(dead_code, unused_variables)]
+use masking::Maskable;
 
-use scheduler::errors::{PTError, ProcessTrackerError};
+#[derive(Debug, Eq, PartialEq)]
+pub enum ApplicationResponse<R> {
+    Json(R),
+    StatusOk,
+    TextPlain(String),
+    FileData((Vec<u8>, mime::Mime)),
+    JsonWithHeaders((R, Vec<(String, Maskable<String>)>)),
+}
 
 #[derive(Clone, Debug, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -257,12 +265,6 @@ pub enum ApiErrorResponse {
     PaymentMethodDeleteFailed,
 }
 
-impl PTError for ApiErrorResponse {
-    fn to_pt_error(&self) -> ProcessTrackerError {
-        ProcessTrackerError::EApiErrorResponse
-    }
-}
-
 #[derive(Clone)]
 pub enum NotImplementedMessage {
     Reason(String),
@@ -294,7 +296,7 @@ impl ::core::fmt::Display for ApiErrorResponse {
 }
 
 impl actix_web::ResponseError for ApiErrorResponse {
-    fn status_code(&self) -> StatusCode {
+    fn status_code(&self) -> actix_web::http::StatusCode {
         common_utils::errors::ErrorSwitch::<api_models::errors::types::ApiErrorResponse>::switch(
             self,
         )
@@ -309,4 +311,4 @@ impl actix_web::ResponseError for ApiErrorResponse {
     }
 }
 
-impl crate::services::EmbedError for error_stack::Report<ApiErrorResponse> {}
+// impl crate::services::EmbedError for error_stack::Report<ApiErrorResponse> {}

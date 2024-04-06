@@ -1,10 +1,16 @@
-use std::{any::Any, collections::HashMap};
+use diesel::{
+    dsl::IntoBoxed,
+    pg::Pg,
+    prelude::*,
+    query_builder::QueryFragment,
+    query_dsl::methods::{BoxedDsl, FilterDsl, LimitDsl, LoadQuery, OffsetDsl, OrderDsl},
+};
+
+use diesel_models::schema::api_key as model;
 
 use common_utils::errors::CustomResult;
-use diesel::ExpressionMethods;
-use diesel::{associations::HasTable, query_dsl::methods::FilterDsl};
-use diesel_models::{errors::DatabaseError, generics, schema::api_key::dsl};
-use error_stack::{Report, ResultExt};
+use diesel_models::errors::DatabaseError;
+use error_stack::Report;
 use router::{connection, services::Store};
 use storage_impl::errors;
 
@@ -17,19 +23,43 @@ pub trait ApiKeyInterface {
         key_id: &str,
     ) -> CustomResult<models::ApiKey, errors::StorageError>;
 
-    async fn list_api_keys(
+    async fn list_api_keys<P, O>(
         &self,
-        filters: impl Any,
+        predicate: P,
         limit: Option<i64>,
         offset: Option<i64>,
-    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError>;
+        order: Option<O>,
+    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError>
+    where
+        P: Send,
+        O: Expression + Send,
+        model::table: BoxedDsl<'static, Pg>,
+        IntoBoxed<'static, model::table, Pg>: FilterDsl<P, Output = IntoBoxed<'static, model::table, Pg>>
+            + LimitDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OffsetDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OrderDsl<O, Output = IntoBoxed<'static, model::table, Pg>>
+            + LoadQuery<'static, PgConnection, models::ApiKey>
+            + QueryFragment<Pg>
+            + Send;
 
-    async fn list_and_count_api_keys(
+    async fn list_and_count_api_keys<P, O>(
         &self,
-        filters: impl Any,
+        predicate: P,
         limit: Option<i64>,
         offset: Option<i64>,
-    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError>;
+        order: Option<O>,
+    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError>
+    where
+        P: Send,
+        O: Expression + Send,
+        model::table: BoxedDsl<'static, Pg>,
+        IntoBoxed<'static, model::table, Pg>: FilterDsl<P, Output = IntoBoxed<'static, model::table, Pg>>
+            + LimitDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OffsetDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OrderDsl<O, Output = IntoBoxed<'static, model::table, Pg>>
+            + LoadQuery<'static, PgConnection, models::ApiKey>
+            + QueryFragment<Pg>
+            + Send;
 
     async fn insert_api_key(
         &self,
@@ -72,25 +102,59 @@ impl ApiKeyInterface for Store {
 
         models::ApiKey::find_by_id(&conn, key_id)
             .await
-            .map_err(|err| err.change_context(errors::StorageError::DatabaseError(err)))
+            .map_err(|err| errors::StorageError::DatabaseError(err).into())
     }
 
-    async fn list_api_keys(
+    async fn list_api_keys<P, O>(
         &self,
-        filters: impl Any,
+        predicate: P,
         limit: Option<i64>,
         offset: Option<i64>,
-    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError> {
-        let conn = connection::pg_connection_write(self).await?;
+        order: Option<O>,
+    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError>
+    where
+        P: Send,
+        O: Expression + Send,
+        model::table: BoxedDsl<'static, Pg>,
+        IntoBoxed<'static, model::table, Pg>: FilterDsl<P, Output = IntoBoxed<'static, model::table, Pg>>
+            + LimitDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OffsetDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OrderDsl<O, Output = IntoBoxed<'static, model::table, Pg>>
+            + LoadQuery<'static, PgConnection, models::ApiKey>
+            + QueryFragment<Pg>
+            + Send,
+    {
+        let conn = connection::pg_connection_read(self).await?;
+
+        models::ApiKey::filter(&conn, predicate, limit, offset, order)
+            .await
+            .map_err(|err| errors::StorageError::DatabaseError(err).into())
     }
 
-    async fn list_and_count_api_keys(
+    async fn list_and_count_api_keys<P, O>(
         &self,
-        filters: impl Any,
+        predicate: P,
         limit: Option<i64>,
         offset: Option<i64>,
-    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError> {
-        let conn = connection::pg_connection_write(self).await?;
+        order: Option<O>,
+    ) -> CustomResult<Vec<models::ApiKey>, errors::StorageError>
+    where
+        P: Send,
+        O: Expression + Send,
+        model::table: BoxedDsl<'static, Pg>,
+        IntoBoxed<'static, model::table, Pg>: FilterDsl<P, Output = IntoBoxed<'static, model::table, Pg>>
+            + LimitDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OffsetDsl<Output = IntoBoxed<'static, model::table, Pg>>
+            + OrderDsl<O, Output = IntoBoxed<'static, model::table, Pg>>
+            + LoadQuery<'static, PgConnection, models::ApiKey>
+            + QueryFragment<Pg>
+            + Send,
+    {
+        let conn = connection::pg_connection_read(self).await?;
+
+        models::ApiKey::filter(&conn, predicate, limit, offset, order)
+            .await
+            .map_err(|err| errors::StorageError::DatabaseError(err).into())
     }
 
     async fn insert_api_key(
@@ -102,7 +166,7 @@ impl ApiKeyInterface for Store {
         api_key
             .insert(&conn)
             .await
-            .map_err(|err| err.change_context(errors::StorageError::DatabaseError(err)))
+            .map_err(|err| errors::StorageError::DatabaseError(err).into())
     }
 
     async fn upsert_api_key(
@@ -110,15 +174,13 @@ impl ApiKeyInterface for Store {
         key_id: &str,
         api_key: models::ApiKeyUpdate,
     ) -> CustomResult<models::ApiKey, errors::StorageError> {
-        let conn = connection::pg_connection_write(self).await?;
-
-        let update_call = || async { self.update_api_key(key_id, api_key).await };
+        let update_call = || async { self.update_api_key(key_id, api_key.clone()).await };
 
         let insert_call = || async {
             let new_api_key: models::ApiKeyNew =
                 match <models::api_key::ApiKeyUpdate as std::convert::Into<
                     models::ApiKeyUpdateInternal,
-                >>::into(api_key)
+                >>::into(api_key.clone())
                 .try_into()
                 {
                     Ok(new_api_key) => new_api_key,
@@ -159,8 +221,10 @@ impl ApiKeyInterface for Store {
                 ApiKeyUpdateInternal::from(api_key),
             )
             .await
-            .map_err(|err| err.change_context(errors::StorageError::DatabaseError(err)))
+            .map_err(|err| errors::StorageError::DatabaseError(err).into())
         };
+
+        update_call().await
     }
 
     async fn delete_api_key(&self, key_id: &str) -> CustomResult<bool, errors::StorageError> {
@@ -169,11 +233,13 @@ impl ApiKeyInterface for Store {
         let delete_call = || async {
             models::ApiKey::delete_by_id(&conn, key_id)
                 .await
-                .map_err(|err| err.change_context(errors::StorageError::DatabaseError(err)))
+                .map_err(|err| errors::StorageError::DatabaseError(err).into())
         };
 
         delete_call().await
     }
+
+    // Custom functions
 
     // async fn revoke_api_key(
     //     &self,
@@ -200,7 +266,7 @@ impl ApiKeyInterface for Store {
                     Report::from(DatabaseError::NotFound),
                 ))),
             },
-            Err(err) => Err(err.change_context(errors::StorageError::DatabaseError(err))),
+            Err(err) => Err(errors::StorageError::DatabaseError(err).into()),
         }
     }
 }

@@ -1,15 +1,13 @@
 use std::sync::Arc;
 
+use data_models::configs::{secrets_transformers, settings};
 use hyperswitch_interfaces::secrets_interface::secret_state::{RawSecret, SecuredSecret};
 use router_env::tracing_actix_web::RequestId;
 use scheduler::SchedulerInterface;
 use storage_impl::mock_db::MockDb;
 use tokio::sync::oneshot;
 
-use crate::{
-    configs::{secrets_transformers, settings},
-    db::{StorageImpl, StorageInterface},
-};
+use crate::db::{StorageImpl, StorageInterface};
 
 #[derive(Clone)]
 pub struct AppState {

@@ -7,16 +7,18 @@ use std::{
 // use analytics::{OpensearchConfig, ReportConfig};
 use common_utils::ext_traits::ConfigExt;
 use config::{Environment, File};
+use data_models::{api_key::PlaintextApiKey, errors};
 #[cfg(feature = "email")]
 use external_services::email::EmailSettings;
 
+use error_stack::ResultExt;
 use external_services::managers::{
     encryption_management::EncryptionManagementConfig, secrets_management::SecretsManagementConfig,
 };
 use hyperswitch_interfaces::secrets_interface::secret_state::{
     SecretState, SecretStateContainer, SecuredSecret,
 };
-use masking::{Maskable, Secret};
+use masking::{Maskable, PeekInterface, Secret, StrongSecret};
 use redis_interface::RedisSettings;
 pub use router_env::config::{Log, LogConsole, LogFile, LogTelemetry};
 use rust_decimal::Decimal;
@@ -273,6 +275,27 @@ pub struct ApiKeys {
     // Specifies the number of days before API key expiry when email reminders should be sent
     #[cfg(feature = "email")]
     pub expiry_reminder_days: Vec<u8>,
+}
+
+static HASH_KEY: once_cell::sync::OnceCell<StrongSecret<[u8; PlaintextApiKey::HASH_KEY_LEN]>> =
+    once_cell::sync::OnceCell::new();
+
+impl ApiKeys {
+    pub fn get_hash_key(
+        &self,
+    ) -> errors::RouterResult<&'static StrongSecret<[u8; PlaintextApiKey::HASH_KEY_LEN]>> {
+        HASH_KEY.get_or_try_init(|| {
+            <[u8; PlaintextApiKey::HASH_KEY_LEN]>::try_from(
+                hex::decode(self.hash_key.peek())
+                    .change_context(errors::ApiErrorResponse::InternalServerError)
+                    .attach_printable("API key hash key has invalid hexadecimal data")?
+                    .as_slice(),
+            )
+            .change_context(errors::ApiErrorResponse::InternalServerError)
+            .attach_printable("The API hashing key has incorrect length")
+            .map(StrongSecret::new)
+        })
+    }
 }
 
 impl Settings<SecuredSecret> {

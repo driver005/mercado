@@ -1,3 +1,1 @@
-pub mod defaults;
-pub mod settings;
-pub mod validations;
+pub use data_models::configs::settings::{ConsumerSettings, ProducerSettings, SchedulerSettings};

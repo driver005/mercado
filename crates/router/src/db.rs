@@ -23,7 +23,8 @@ pub trait StorageInterface:
     + MasterKeyInterface
     + RedisConnInterface
     + RequestIdStore
-    + 'static // api_keys::ApiKeyInterface +
+    // + api_keys::ApiKeyInterface
+    + 'static
 {
     fn get_scheduler_db(&self) -> Box<dyn scheduler::SchedulerInterface>;
 }

@@ -1,14 +1,14 @@
 use actix_web::{body, dev::ServiceResponse, middleware::ErrorHandlerResponse, ResponseError};
-use http::StatusCode;
+use router_env::logger;
 
-use super::ApiErrorResponse;
-use crate::logger;
+use crate::errors::ApiErrorResponse;
+
 pub fn custom_error_handlers<B: body::MessageBody + 'static>(
     res: ServiceResponse<B>,
 ) -> actix_web::Result<ErrorHandlerResponse<B>> {
     let error_response = match res.status() {
-        StatusCode::NOT_FOUND => ApiErrorResponse::InvalidRequestUrl,
-        StatusCode::METHOD_NOT_ALLOWED => ApiErrorResponse::InvalidHttpMethod,
+        actix_web::http::StatusCode::NOT_FOUND => ApiErrorResponse::InvalidRequestUrl,
+        actix_web::http::StatusCode::METHOD_NOT_ALLOWED => ApiErrorResponse::InvalidHttpMethod,
         _ => ApiErrorResponse::InternalServerError,
     };
 

@@ -1,4 +1,4 @@
-use http::StatusCode;
+use actix_web::http::StatusCode;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CustomersErrorResponse {

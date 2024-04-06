@@ -37,7 +37,7 @@ pub struct ApiKeyNew {
     pub revoked_at: Option<PrimitiveDateTime>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ApiKeyUpdate {
     Update {
         title: Option<String>,

@@ -1,8 +1,8 @@
+use actix_web::http::StatusCode;
 use api_models::errors::types::Extra;
 use common_utils::errors::ErrorSwitch;
-use http::StatusCode;
 
-use super::{ApiErrorResponse, ConnectorError, CustomersErrorResponse, StorageError};
+use super::{ApiErrorResponse, CustomersErrorResponse, StorageError};
 
 impl ErrorSwitch<api_models::errors::types::ApiErrorResponse> for ApiErrorResponse {
     fn switch(&self) -> api_models::errors::types::ApiErrorResponse {
@@ -291,23 +291,23 @@ impl ErrorSwitch<api_models::errors::types::ApiErrorResponse> for ApiErrorRespon
     }
 }
 
-impl ErrorSwitch<ApiErrorResponse> for ConnectorError {
-    fn switch(&self) -> ApiErrorResponse {
-        match self {
-            Self::WebhookSourceVerificationFailed => ApiErrorResponse::WebhookAuthenticationFailed,
-            Self::WebhookSignatureNotFound
-            | Self::WebhookReferenceIdNotFound
-            | Self::WebhookResourceObjectNotFound
-            | Self::WebhookBodyDecodingFailed
-            | Self::WebhooksNotImplemented => ApiErrorResponse::WebhookBadRequest,
-            Self::WebhookEventTypeNotFound => ApiErrorResponse::WebhookUnprocessableEntity,
-            Self::WebhookVerificationSecretInvalid => {
-                ApiErrorResponse::WebhookInvalidMerchantSecret
-            }
-            _ => ApiErrorResponse::InternalServerError,
-        }
-    }
-}
+// impl ErrorSwitch<ApiErrorResponse> for ConnectorError {
+//     fn switch(&self) -> ApiErrorResponse {
+//         match self {
+//             Self::WebhookSourceVerificationFailed => ApiErrorResponse::WebhookAuthenticationFailed,
+//             Self::WebhookSignatureNotFound
+//             | Self::WebhookReferenceIdNotFound
+//             | Self::WebhookResourceObjectNotFound
+//             | Self::WebhookBodyDecodingFailed
+//             | Self::WebhooksNotImplemented => ApiErrorResponse::WebhookBadRequest,
+//             Self::WebhookEventTypeNotFound => ApiErrorResponse::WebhookUnprocessableEntity,
+//             Self::WebhookVerificationSecretInvalid => {
+//                 ApiErrorResponse::WebhookInvalidMerchantSecret
+//             }
+//             _ => ApiErrorResponse::InternalServerError,
+//         }
+//     }
+// }
 
 impl ErrorSwitch<api_models::errors::types::ApiErrorResponse> for CustomersErrorResponse {
     fn switch(&self) -> api_models::errors::types::ApiErrorResponse {

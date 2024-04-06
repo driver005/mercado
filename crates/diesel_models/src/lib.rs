@@ -1,8 +1,11 @@
+pub mod api_key;
 pub mod enums;
 pub mod errors;
 pub mod generics;
+pub mod models;
 pub mod modules;
 pub mod query;
+pub mod user;
 
 #[cfg(feature = "kv_store")]
 pub mod kv;
